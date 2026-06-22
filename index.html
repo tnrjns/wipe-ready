@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wipe Ready — Rust Coaching by Tanner Jensen</title>
+<meta name="description" content="Stop dying to naked rock spammers. Wipe Ready is a Rust course that turns you into a real threat — base building, PvP, and progression that wins wipes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16140f;
+    --bg-panel: #1f1c15;
+    --steel: #8a8275;
+    --rust: #c4622d;
+    --rust-dark: #8c4420;
+    --sand: #e8e2d4;
+    --sand-dim: #b9b2a0;
+    --radio-green: #6f9b6e;
+    --rivet: #0c0b08;
+    --display: 'Bebas Neue', 'Oswald', sans-serif;
+    --head: 'Oswald', sans-serif;
+    --body: 'Inter', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(196,98,45,0.07), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(111,155,110,0.05), transparent 50%),
+      var(--bg);
+    color: var(--sand);
+    font-family: var(--body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  /* texture overlay */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    pointer-events:none;
+    z-index: 1000;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+  }
+
+  .wrap{max-width: 1120px; margin:0 auto; padding: 0 28px;}
+
+  /* nav */
+  header.nav{
+    position: sticky; top:0; z-index: 100;
+    background: rgba(22,20,15,0.88);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid rgba(138,130,117,0.25);
+  }
+  .nav-inner{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 16px 28px;
+    max-width: 1120px; margin:0 auto;
+  }
+  .brand{
+    font-family: var(--display);
+    font-size: 1.5rem;
+    letter-spacing: 0.06em;
+    color: var(--sand);
+  }
+  .brand span{color: var(--rust);}
+  nav.links{display:flex; gap: 28px; font-family: var(--head); font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase;}
+  nav.links a{text-decoration:none; color: var(--sand-dim); transition: color .15s;}
+  nav.links a:hover, nav.links a:focus-visible{color: var(--rust);}
+  .nav-cta{
+    font-family: var(--head); font-size:0.78rem; letter-spacing:0.08em; text-transform:uppercase;
+    background: var(--rust); color: #16140f; padding: 10px 18px; border-radius: 2px;
+    text-decoration:none; font-weight:600;
+    border: 1px solid var(--rust);
+    transition: background .15s, color .15s;
+  }
+  .nav-cta:hover{background:transparent; color:var(--rust);}
+
+  @media (max-width: 760px){
+    nav.links{display:none;}
+  }
+
+  /* hero */
+  .hero{
+    padding: 96px 0 80px;
+    border-bottom: 1px solid rgba(138,130,117,0.18);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after{
+    content:"";
+    position:absolute; right:-10%; top:-20%;
+    width: 600px; height:600px;
+    background: radial-gradient(circle, rgba(196,98,45,0.12), transparent 65%);
+    pointer-events:none;
+  }
+  .eyebrow{
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--radio-green);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    display:flex; align-items:center; gap: 10px;
+    margin-bottom: 22px;
+  }
+  .eyebrow::before{
+    content:"";
+    width: 8px; height:8px; background: var(--radio-green);
+    box-shadow: 0 0 8px var(--radio-green);
+    border-radius: 50%;
+    animation: pulse 2s infinite ease-in-out;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+
+  .hero h1{
+    font-family: var(--display);
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    line-height: 0.96;
+    letter-spacing: 0.01em;
+    color: var(--sand);
+    max-width: 16ch;
+    text-transform: uppercase;
+  }
+  .hero h1 .accent{
+    color: var(--rust);
+    -webkit-text-stroke: 0;
+  }
+  .hero p.sub{
+    margin-top: 26px;
+    font-size: 1.15rem;
+    color: var(--sand-dim);
+    max-width: 56ch;
+  }
+  .hero-ctas{
+    margin-top: 36px;
+    display:flex; gap:16px; flex-wrap:wrap;
+  }
+  .btn{
+    font-family: var(--head); font-weight:600; font-size:0.85rem;
+    letter-spacing:0.07em; text-transform:uppercase;
+    padding: 16px 30px; border-radius:2px;
+    text-decoration:none; display:inline-block;
+    transition: transform .12s ease, background .15s, color .15s, border-color .15s;
+  }
+  .btn:active{transform: translateY(1px);}
+  .btn-primary{ background: var(--rust); color:#16140f; border:1px solid var(--rust);}
+  .btn-primary:hover{ background:#d97339; border-color:#d97339;}
+  .btn-ghost{ background:transparent; color:var(--sand); border:1px solid rgba(138,130,117,0.5);}
+  .btn-ghost:hover{ border-color: var(--sand); }
+
+  .hero-stats{
+    margin-top: 64px;
+    display:grid; grid-template-columns: repeat(4,1fr); gap: 1px;
+    background: rgba(138,130,117,0.25);
+    border: 1px solid rgba(138,130,117,0.25);
+  }
+  .hero-stats div{ background: var(--bg); padding: 18px 20px;}
+  .hero-stats .num{ font-family:var(--mono); font-size:1.6rem; color:var(--rust); font-weight:700;}
+  .hero-stats .label{ font-size:0.72rem; color:var(--sand-dim); text-transform:uppercase; letter-spacing:0.06em; margin-top:4px;}
+  @media (max-width:680px){ .hero-stats{grid-template-columns:repeat(2,1fr);} }
+
+  /* section heading pattern */
+  .section{ padding: 88px 0; border-bottom: 1px solid rgba(138,130,117,0.18); }
+  .section-head{ margin-bottom: 48px; max-width: 60ch; }
+  .kicker{
+    font-family: var(--mono); font-size:0.75rem; color: var(--rust);
+    text-transform:uppercase; letter-spacing:0.14em; margin-bottom:14px;
+  }
+  .section-head h2{
+    font-family: var(--display); font-size: clamp(2rem,4vw,3.2rem);
+    text-transform:uppercase; letter-spacing:0.01em; line-height:1.02;
+  }
+  .section-head p{ margin-top:16px; color:var(--sand-dim); font-size:1.05rem;}
+
+  /* problem/who-its-for */
+  .grid-2{ display:grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width:760px){ .grid-2{grid-template-columns:1fr;} }
+  .panel{
+    background: var(--bg-panel);
+    border: 1px solid rgba(138,130,117,0.22);
+    padding: 28px 26px;
+    border-radius: 2px;
+    position: relative;
+  }
+  .panel .rivet{
+    position:absolute; width:7px; height:7px; background:var(--rivet);
+    border:1px solid rgba(138,130,117,0.4); border-radius:50%;
+  }
+  .panel .rivet.tl{top:10px;left:10px;} .panel .rivet.tr{top:10px;right:10px;}
+  .panel .rivet.bl{bottom:10px;left:10px;} .panel .rivet.br{bottom:10px;right:10px;}
+  .panel h3{ font-family: var(--head); font-size:1.15rem; text-transform:uppercase; letter-spacing:0.03em; margin-bottom:12px;}
+  .panel.bad h3{color:#c4622d;}
+  .panel.good h3{color:var(--radio-green);}
+  .panel ul{ list-style:none; }
+  .panel li{ padding: 9px 0; border-top: 1px dashed rgba(138,130,117,0.25); color:var(--sand-dim); font-size:0.96rem;}
+  .panel li:first-child{border-top:none;}
+
+  /* curriculum */
+  .modules{ display:flex; flex-direction:column; }
+  .module{
+    display:grid; grid-template-columns: 90px 1fr; gap: 24px;
+    padding: 26px 0; border-top: 1px solid rgba(138,130,117,0.22);
+  }
+  .module:last-child{border-bottom: 1px solid rgba(138,130,117,0.22);}
+  .module .tag{ font-family: var(--mono); color: var(--steel); font-size:0.78rem; padding-top:4px;}
+  .module h4{ font-family:var(--head); font-size:1.25rem; text-transform:uppercase; letter-spacing:0.02em; color:var(--sand);}
+  .module p{ color:var(--sand-dim); margin-top:8px; font-size:0.98rem; max-width:62ch;}
+  .module .meta{ font-family:var(--mono); font-size:0.74rem; color:var(--rust); margin-top:10px; text-transform:uppercase; letter-spacing:0.06em;}
+
+  /* pricing */
+  .crate{
+    background: linear-gradient(160deg, var(--bg-panel), #181510);
+    border: 1px solid rgba(196,98,45,0.4);
+    border-radius: 3px;
+    padding: 46px 44px;
+    max-width: 560px;
+    margin: 0 auto;
+    position: relative;
+    box-shadow: 0 0 0 1px rgba(0,0,0,0.4), 0 30px 60px -30px rgba(196,98,45,0.25);
+  }
+  .crate::before, .crate::after{
+    content:""; position:absolute; top:18px; bottom:18px; width:1px;
+    background: repeating-linear-gradient(to bottom, rgba(138,130,117,0.4) 0 6px, transparent 6px 12px);
+  }
+  .crate::before{left:18px;} .crate::after{right:18px;}
+  .crate-label{ font-family:var(--mono); color:var(--radio-green); font-size:0.74rem; letter-spacing:0.12em; text-transform:uppercase; text-align:center; margin-bottom:10px;}
+  .crate h3{ font-family:var(--display); font-size:2.6rem; text-align:center; text-transform:uppercase; letter-spacing:0.02em;}
+  .price{ text-align:center; margin: 18px 0 6px; }
+  .price .amount{ font-family:var(--mono); font-size:3rem; font-weight:700; color:var(--rust);}
+  .price .per{ font-family:var(--mono); color:var(--sand-dim); font-size:0.85rem;}
+  .crate-list{ list-style:none; margin: 28px 0; }
+  .crate-list li{ padding:10px 0; border-top:1px dashed rgba(138,130,117,0.25); font-size:0.95rem; color:var(--sand-dim); display:flex; gap:10px;}
+  .crate-list li:first-child{border-top:none;}
+  .crate-list li::before{content:"▸"; color:var(--rust);}
+  .crate .btn{ width:100%; text-align:center; margin-top:6px;}
+  .crate .fine{ text-align:center; margin-top:16px; font-size:0.78rem; color:var(--steel); font-family:var(--mono);}
+
+  /* about */
+  .about{ display:grid; grid-template-columns: 200px 1fr; gap: 40px; align-items:start; }
+  @media (max-width:680px){ .about{grid-template-columns:1fr;} }
+  .avatar{
+    width: 100%; aspect-ratio:1; background: var(--bg-panel);
+    border: 1px solid rgba(138,130,117,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--display); font-size:3.5rem; color: var(--rust);
+  }
+  .about h3{ font-family:var(--head); text-transform:uppercase; letter-spacing:0.03em; font-size:1.3rem; margin-bottom:10px;}
+  .about p{ color:var(--sand-dim); max-width:64ch; }
+  .about p + p{ margin-top:14px; }
+
+  /* contact */
+  .contact-grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 40px;}
+  @media (max-width:680px){ .contact-grid{grid-template-columns:1fr;} }
+  .contact-card{ font-family:var(--mono); font-size:0.95rem; }
+  .contact-card .row{ display:flex; justify-content:space-between; padding:14px 0; border-top:1px dashed rgba(138,130,117,0.25); }
+  .contact-card .row:first-child{border-top:none;}
+  .contact-card .row span:first-child{color:var(--steel);}
+  .contact-card .row a{color:var(--sand); text-decoration:none; border-bottom:1px solid var(--rust);}
+  .contact-card .row a:hover{color:var(--rust);}
+
+  footer{ padding: 36px 0; text-align:center; font-family:var(--mono); font-size:0.78rem; color:var(--steel);}
+  footer .brand-foot{color:var(--rust);}
+
+  ::selection{ background: var(--rust); color: #16140f; }
+  :focus-visible{ outline: 2px solid var(--radio-green); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand">WIPE<span>READY</span></div>
+    <nav class="links">
+      <a href="#curriculum">Curriculum</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#about">Coach</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <a class="nav-cta" href="#pricing">Enroll</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Server online — recruiting now</div>
+      <h1>Stop getting <span class="accent">third-partied</span> by a guy with a rock.</h1>
+      <p class="sub">Wipe Ready is a Rust coaching course built around one goal: turn your first 48 hours into a base, a kit, and a kill count that actually holds up. No fluff, no theorycrafting — drills and builds pulled straight from competitive wipes.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#pricing">Get the course — $49</a>
+        <a class="btn btn-ghost" href="#curriculum">See what's inside</a>
+      </div>
+      <div class="hero-stats">
+        <div><div class="num">9</div><div class="label">Core modules</div></div>
+        <div><div class="num">40+</div><div class="label">Build &amp; fight clips</div></div>
+        <div><div class="num">6,200</div><div class="label">Hours in-game</div></div>
+        <div><div class="num">1:1</div><div class="label">Review available</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="who">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Reality check</div>
+        <h2>You're not bad at Rust. You're undertrained.</h2>
+        <p>Most players spend 200 hours repeating the same mistakes. The course exists to compress that into a weekend.</p>
+      </div>
+      <div class="grid-2">
+        <div class="panel bad">
+          <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+          <h3>Where you're losing wipes</h3>
+          <ul>
+            <li>Building a base that takes 40 minutes and folds in 10</li>
+            <li>Losing every roam because spray control is a guess</li>
+            <li>No farming route, so you hit the timer with nothing built</li>
+            <li>Panic-decisions when a raid horn goes off</li>
+            <li>Solo-queuing into duo and trio stacks with no plan</li>
+          </ul>
+        </div>
+        <div class="panel good">
+          <span class="rivet tl"></span><span class="rivet tr"></span><span class="rivet bl"></span><span class="rivet br"></span>
+          <h3>What changes after this course</h3>
+          <ul>
+            <li>A core build you can place asleep, honeycombed correctly</li>
+            <li>Recoil patterns drilled until they're muscle memory</li>
+            <li>A farming loop that hits T2 before the first night</li>
+            <li>A raid-defense checklist you run in under 30 seconds</li>
+            <li>Rotations and positioning that don't rely on luck</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="curriculum">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Curriculum</div>
+        <h2>Nine modules. Built in wipe order.</h2>
+        <p>Each module maps to a phase of an actual wipe — work through it in order, or jump straight to the phase you're bleeding the most in.</p>
+      </div>
+      <div class="modules">
+        <div class="module"><div class="tag">M.01</div><div><h4>Spawn-to-stone in under an hour</h4><p>Land timing, node priority, and the opening loop that gets you from naked to a locked door before anyone else is awake.</p><div class="meta">22 min · checklist included</div></div></div>
+        <div class="module"><div class="tag">M.02</div><div><h4>Core base designs that actually hold</h4><p>Three honeycomb layouts for solo, duo, and group play, with upgrade paths from twig to sheet metal that don't waste a single wall.</p><div class="meta">38 min · build files included</div></div></div>
+        <div class="module"><div class="tag">M.03</div><div><h4>Farming loops and loot routes</h4><p>Monument rotations and resource paths that fill your storage while everyone else is still chopping the same three trees.</p><div class="meta">19 min</div></div></div>
+        <div class="module"><div class="tag">M.04</div><div><h4>Recoil control, drilled</h4><p>Spray patterns for the AK, MP5, and Thompson broken into reps, plus the practice range routine to make it stick.</p><div class="meta">31 min · aim drills</div></div></div>
+        <div class="module"><div class="tag">M.05</div><div><h4>Peeking, positioning, and trading fights</h4><p>How to win a 1v1 before it starts — angles, sound cues, and when to disengage instead of feeding a kill.</p><div class="meta">27 min</div></div></div>
+        <div class="module"><div class="tag">M.06</div><div><h4>Monument PvE without dying to the puzzle</h4><p>Launch site, Oil Rig, and Sulfur Quarry routes that prioritize survival first, loot second.</p><div class="meta">24 min</div></div></div>
+        <div class="module"><div class="tag">M.07</div><div><h4>Raiding on a budget</h4><p>Explosive math, soft-side detection, and minimal-cost raids that don't bankrupt your whole stockpile.</p><div class="meta">29 min · raid calculator</div></div></div>
+        <div class="module"><div class="tag">M.08</div><div><h4>Defending against a raid in progress</h4><p>The 30-second checklist: what to grab, where to stand, and when a base is actually worth fighting for.</p><div class="meta">18 min</div></div></div>
+        <div class="module"><div class="tag">M.09</div><div><h4>Group shotcalling and team comp</h4><p>Roles, callouts, and rotation timing for duo and trio stacks pushing for a wipe win.</p><div class="meta">25 min</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="pricing">
+    <div class="wrap">
+      <div class="section-head" style="text-align:center; max-width:none;">
+        <div class="kicker">Loadout</div>
+        <h2>One price. Everything unlocked.</h2>
+      </div>
+      <div class="crate">
+        <div class="crate-label">Lvl 3 Workbench Required: No</div>
+        <h3>Wipe Ready</h3>
+        <div class="price"><span class="amount">$49</span> <span class="per">one-time</span></div>
+        <ul class="crate-list">
+          <li>All 9 video modules, lifetime access</li>
+          <li>Downloadable base build files</li>
+          <li>Aim training routine + recoil reference sheet</li>
+          <li>Raid cost calculator spreadsheet</li>
+          <li>Private Discord with build &amp; clip review</li>
+          <li>Free updates every wipe cycle</li>
+        </ul>
+        <a class="btn btn-primary" href="mailto:tannerjensen@gmail.com?subject=Wipe%20Ready%20-%20Enrollment">Enroll now</a>
+        <div class="fine">7-day refund if you're not winning more fights</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Your coach</div>
+        <h2>Built by someone who's actually wiped 200+ times.</h2>
+      </div>
+      <div class="about">
+        <div class="avatar">TJ</div>
+        <div>
+          <h3>Tanner Jensen</h3>
+          <p>I've spent over 6,000 hours in Rust across solo, duo, and clan wipes — building, raiding, and getting raided in roughly equal measure. Wipe Ready is everything I wish someone had handed me in my first hundred hours, instead of making me learn it through 200 wipes of trial and error.</p>
+          <p>No filler, no 45-minute "let's chat" intros. Just the builds, drills, and decisions that actually move your win rate.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="contact" style="border-bottom:none;">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Get in touch</div>
+        <h2>Questions before you enroll?</h2>
+        <p>Reach out directly — every message gets answered by Tanner, not a support team.</p>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-card">
+          <div class="row"><span>Email</span><a href="mailto:tannerjensen@gmail.com">tannerjensen@gmail.com</a></div>
+          <div class="row"><span>Phone</span><a href="tel:+12173442276">(217) 344-2276</a></div>
+          <div class="row"><span>Response time</span><span style="color:var(--sand-dim)">Usually under 24h</span></div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    &copy; 2026 <span class="brand-foot">Wipe Ready</span> — Tanner Jensen. Not affiliated with Facepunch Studios.
+  </div>
+</footer>
+
+</body>
+</html>
